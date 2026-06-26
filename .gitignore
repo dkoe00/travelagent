@@ -14,3 +14,7 @@ uv.lock
 
 # Secrets
 .env
+
+# Claude files
+CLAUDE.md
+.claude/
