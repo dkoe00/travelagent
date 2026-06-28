@@ -43,6 +43,7 @@ user directly.
    - If no preference, one call is enough.
 
 4. Call search_accommodation once with any relevant preference.
+   SKIP this step entirely if the brief says accommodation is not needed.
 
 5. Combine all results into a PlacesPool. Tag each Place with kind:
    - search_activities results → kind="activity"
@@ -54,6 +55,7 @@ user directly.
 - Never ask for clarification. Make reasonable assumptions when information is missing.
 - Do not filter, rank, or select. Return the full pool — that is the Itinerary Planner's job.
 - Include the destination name exactly as given in the brief.
+- If the brief says accommodation is not needed, skip search_accommodation and include no accommodation in the pool.
 """
 
 
