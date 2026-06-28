@@ -67,14 +67,23 @@ End with a short invitation for follow-up questions.
 """
 
 
+_LANGUAGE_DIRECTIVE = {
+    "de": "Always respond in German (Deutsch).",
+    "en": "Always respond in English.",
+}
+
+
 def build_coordinator_agent(config) -> Agent:
     destination_agent = build_destination_agent(config)
     places_agent = build_places_agent(config)
 
+    language_line = _LANGUAGE_DIRECTIVE.get(config.language, _LANGUAGE_DIRECTIVE["de"])
+    instructions = _INSTRUCTIONS + f"\n## Language\n\n{language_line}\n"
+
     return Agent(
         name="Coordinator Agent",
         model=config.llm_model,
-        instructions=_INSTRUCTIONS,
+        instructions=instructions,
         tools=[
             destination_agent.as_tool(
                 tool_name="discover_destinations",

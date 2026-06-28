@@ -37,12 +37,28 @@ def _parse_bool(value: str | None, default: bool = False) -> bool:
     )
 
 
+_SUPPORTED_LANGUAGES = {"de", "en"}
+
+
+def _parse_language(value: str | None, default: str = "de") -> str:
+    normalized = _empty_to_none(value)
+    if normalized is None:
+        return default
+    lang = normalized.lower()
+    if lang not in _SUPPORTED_LANGUAGES:
+        raise ValueError(
+            f"Invalid value for LANGUAGE: {value!r}. Supported: {sorted(_SUPPORTED_LANGUAGES)}"
+        )
+    return lang
+
+
 @dataclass(frozen=True)
 class AppConfig:
     llm_api_key: str | None = field(repr=False)
     llm_base_url: str | None
     llm_model: str = "gpt-5-nano"
     enable_tracing: bool = False
+    language: str = "de"
 
 
 APP_CONFIG = AppConfig(
@@ -50,4 +66,5 @@ APP_CONFIG = AppConfig(
     llm_base_url=_empty_to_none(os.getenv("LLM_BASE_URL")),
     llm_model=_empty_to_none(os.getenv("LLM_MODEL")) or "gpt-5-nano",
     enable_tracing=_parse_bool(os.getenv("ENABLE_TRACING"), default=False),
+    language=_parse_language(os.getenv("LANGUAGE"), default="de"),
 )

@@ -97,6 +97,7 @@ LLM_API_KEY=your_api_key_here
 LLM_BASE_URL=your_optional_custom_endpoint_here
 LLM_MODEL=your_model_name_here
 ENABLE_TRACING=false
+LANGUAGE=de  # de (German) or en (English) — defaults to de
 ```
 
 Do not commit `.env` or any real API keys.
