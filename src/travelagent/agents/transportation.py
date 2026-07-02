@@ -6,7 +6,10 @@ from agents import Agent, Tool
 
 from travelagent.config import AppConfig
 from travelagent.tools.geocode import build_geocode_location_tool
-from travelagent.tools.routing import build_estimate_route_tool
+from travelagent.tools.routing import (
+    build_compare_transport_options_tool,
+    build_estimate_route_tool,
+)
 
 _INSTRUCTIONS = """
 You are the Transportation Agent in a multi-agent travel planning system.
@@ -18,7 +21,10 @@ just shortest theoretical travel time.
 When given an origin and destination:
 - Identify or confirm the locations before making route claims.
 - Use geocode_location when coordinates or place disambiguation matter.
-- Use estimate_route for factual distance and driving-time estimates.
+- Use compare_transport_options as the default tool for deciding how to travel
+  between two places.
+- Use estimate_route only when you need a single driving distance or driving
+  time estimate.
 - Coordinate with the Budget Agent whenever transport cost or affordability is
   relevant.
 - Consider travel time, cost, comfort, reliability, luggage burden, transfers,
@@ -50,6 +56,7 @@ def build_transportation_agent(
     tools: list[Tool] = [
         build_geocode_location_tool(config),
         build_estimate_route_tool(config),
+        build_compare_transport_options_tool(config),
     ]
     # TODO @dkoe00: Add typed budget-agent parameters.
     tools.append(
