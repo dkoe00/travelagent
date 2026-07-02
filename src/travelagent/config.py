@@ -47,6 +47,8 @@ class AppConfig:
     nominatim_user_agent: str = "travelagent-seminar/0.1"
     nominatim_email: str | None = None
     nominatim_timeout_seconds: float = 10.0
+    osrm_base_url: str = "https://router.project-osrm.org/route/v1"
+    osrm_timeout_seconds: float = 10.0
 
 
 APP_CONFIG = AppConfig(
@@ -65,5 +67,12 @@ APP_CONFIG = AppConfig(
     nominatim_email=_empty_to_none(os.getenv("NOMINATIM_EMAIL")),
     nominatim_timeout_seconds=float(
         _empty_to_none(os.getenv("NOMINATIM_TIMEOUT_SECONDS")) or "10"
+    ),
+    osrm_base_url=(
+        _empty_to_none(os.getenv("OSRM_BASE_URL"))
+        or "https://router.project-osrm.org/route/v1"
+    ),
+    osrm_timeout_seconds=float(
+        _empty_to_none(os.getenv("OSRM_TIMEOUT_SECONDS")) or "10"
     ),
 )

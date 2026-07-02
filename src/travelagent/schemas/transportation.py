@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Geolocation(BaseModel):
@@ -17,3 +17,18 @@ class GeolocationList(BaseModel):
 
     query: str
     locations: list[Geolocation]
+
+
+class RouteEstimate(BaseModel):
+    """Normalized route estimate between two geocoded locations."""
+
+    origin_query: str
+    destination_query: str
+    origin: Geolocation
+    destination: Geolocation
+    mode: str
+    distance_meters: float
+    duration_seconds: float
+    duration_minutes: float
+    provider: str = "osrm"
+    uncertainty_notes: list[str] = Field(default_factory=list)
