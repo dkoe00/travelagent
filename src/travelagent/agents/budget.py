@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from agents import Agent
 
+from travelagent.config import AppConfig
 from travelagent.tools.budget import build_estimate_transport_cost_tool
 
 
-def build_budget_agent(config) -> Agent:
+def build_budget_agent(config: AppConfig) -> Agent[object]:
     # TODO @dkoe00: Add full-trip budget tools.
     return Agent(
         name="Budget Agent",
