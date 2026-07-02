@@ -1,8 +1,8 @@
 # travelagent
 
-Travelagent is a Python-based prototype of a multi-agent travel planning assistant built for a university seminar on LLM-based agentic systems and multi-agent systems.
+Travelagent is a Python-based multi-agent travel planning assistant. It started as a university seminar project on LLM-based agentic systems and multi-agent systems, but the project is now intended to continue beyond the seminar and become practically usable for private trip planning.
 
-The project uses the OpenAI Agents SDK as the main framework under investigation. The goal is not only to build a working travel assistant, but also to understand, demonstrate, and critically evaluate how the SDK supports multi-agent system development.
+The project uses the OpenAI Agents SDK as the main framework. The near-term goal is still to keep the implementation small and understandable, while progressively replacing prototype shortcuts with reliable data sources, stronger planning logic, and workflows that are useful for real private travel decisions.
 
 ## Use Case
 
@@ -101,9 +101,9 @@ ENABLE_TRACING=false
 
 Do not commit `.env` or any real API keys.
 
-## Running the Prototype
+## Running the App
 
-Run the current terminal prototype with:
+Run the current terminal app with:
 
 ```bash
 uv run python main.py
