@@ -35,6 +35,7 @@ def search_nominatim(
     if config.nominatim_email:
         params["email"] = config.nominatim_email
 
+    # TODO @dkoe00: Add geocode caching/rate limiting.
     request = Request(
         f"{config.nominatim_base_url}?{urlencode(params)}",
         headers={

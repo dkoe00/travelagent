@@ -29,6 +29,7 @@ def estimate_osrm_route(
     config: AppConfig,
 ) -> RouteEstimate:
     """Estimate fastest route distance and duration through OSRM."""
+    # TODO @dkoe00: Add multimodal routing providers.
     normalized_origin = origin.strip()
     normalized_destination = destination.strip()
     normalized_mode = _normalize_mode(mode)
@@ -145,6 +146,7 @@ def _uncertainty_notes(
     mode: str,
 ) -> list[str]:
     notes = [
+        # TODO @dkoe00: Replace driving-only uncertainty note.
         f"Mode {mode!r} estimates road travel only; public transport is not included yet.",
     ]
     if len(origin_candidates) > 1:

@@ -33,6 +33,7 @@ def estimate_transport_cost(
     currency: str = "EUR",
 ) -> TransportCostEstimate:
     """Estimate transportation cost from mode, distance, and duration."""
+    # TODO @dkoe00: Replace heuristic fares with live prices.
     normalized_mode = _normalize_transport_mode(mode)
     normalized_currency = currency.strip().upper() or "EUR"
     distance_km = max(distance_meters, 0) / 1000
