@@ -1,8 +1,8 @@
 # travelagent
 
-Travelagent is a Python-based prototype of a multi-agent travel planning assistant built for a university seminar on LLM-based agentic systems and multi-agent systems.
+Travelagent is a Python-based multi-agent travel planning assistant. It started as a university seminar project on LLM-based agentic systems and multi-agent systems, but the project is now intended to continue beyond the seminar and become practically usable for private trip planning.
 
-The project uses the OpenAI Agents SDK as the main framework under investigation. The goal is not only to build a working travel assistant, but also to understand, demonstrate, and critically evaluate how the SDK supports multi-agent system development.
+The project uses the OpenAI Agents SDK as the main framework. The near-term goal is still to keep the implementation small and understandable, while progressively replacing prototype shortcuts with reliable data sources, stronger planning logic, and workflows that are useful for real private travel decisions.
 
 ## Use Case
 
@@ -28,7 +28,7 @@ The planned system consists of several specialized agents:
 - **Budget Agent**: estimates costs, handles currencies if needed, and flags budget overruns
 - **Itinerary Planner Agent**: schedules activities into feasible time blocks and creates fallback options
 
-The current implementation is an early work in progress. At this stage, the repository focuses on project setup, configuration, and minimal SDK smoke tests.
+The current implementation is an early work in progress. At this stage, the repository focuses on the core multi-agent structure, transportation and budget tooling, and stable interfaces that can later be backed by better live data.
 
 ## Tech Stack
 
@@ -57,9 +57,9 @@ ENABLE_TRACING=false
 
 Do not commit `.env` or any real API keys.
 
-## Running the Prototype
+## Running the App
 
-Run the current terminal prototype with:
+Run the current terminal app with:
 
 ```bash
 uv run python main.py
@@ -67,10 +67,10 @@ uv run python main.py
 
 ## Project Status
 
-This repository is currently in the implementation setup phase. The next planned steps are:
+This repository is currently moving from seminar demo toward a usable private travel planning assistant. The next planned steps are:
 
-1. finalize the runtime configuration for OpenAI-compatible custom endpoints
-2. implement the minimal Coordinator Agent smoke test
-3. add mock tools for weather, places, transportation, and budgeting
-4. implement specialist agents and evaluate handoffs/delegation patterns
-5. prepare a demo scenario for the seminar presentation
+1. wire specialist agents into the Coordinator workflow
+2. complete transportation mode comparison with budget-aware recommendations
+3. add live data sources for transport costs, public transport, weather, and places where feasible
+4. keep deterministic fallback paths for repeatable local testing
+5. replace prototype heuristics with production-quality providers as the app matures

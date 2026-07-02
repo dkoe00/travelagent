@@ -44,7 +44,7 @@ class AppConfig:
     llm_model: str = "gpt-5-nano"
     enable_tracing: bool = False
     nominatim_base_url: str = "https://nominatim.openstreetmap.org/search"
-    nominatim_user_agent: str = "travelagent-seminar/0.1"
+    nominatim_user_agent: str = "travelagent-private-planner/0.1"
     nominatim_email: str | None = None
     nominatim_timeout_seconds: float = 10.0
     osrm_base_url: str = "https://router.project-osrm.org/route/v1"
@@ -62,7 +62,7 @@ APP_CONFIG = AppConfig(
     ),
     nominatim_user_agent=(
         _empty_to_none(os.getenv("NOMINATIM_USER_AGENT"))
-        or "travelagent-seminar/0.1"
+        or "travelagent-private-planner/0.1"
     ),
     nominatim_email=_empty_to_none(os.getenv("NOMINATIM_EMAIL")),
     nominatim_timeout_seconds=float(
