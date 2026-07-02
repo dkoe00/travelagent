@@ -2,11 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
-
 from pydantic import BaseModel, Field
-
-CostConfidence = Literal["low", "medium", "high"]
 
 
 class MoneyEstimate(BaseModel):
@@ -31,5 +27,5 @@ class TransportCostEstimate(BaseModel):
     duration_minutes: float = Field(ge=0)
     estimated_cost: MoneyEstimate
     estimated_range: CostRange | None = None
-    confidence: CostConfidence = "medium"
+    confidence: str = "medium"
     assumptions: list[str] = Field(default_factory=list)
