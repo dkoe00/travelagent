@@ -7,6 +7,7 @@ from agents import Agent
 
 def build_coordinator_agent(config) -> Agent:
     """Build the Coordinator Agent for the terminal-only prototype."""
+    # TODO @dkoe00: Wire transportation and budget agents.
     return Agent(
         name="Coordinator Agent",
         model=config.llm_model,

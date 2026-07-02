@@ -92,3 +92,32 @@ class TransportRecommendation(BaseModel):
     summary: str
     driving_option_included: bool
     uncertainty_notes: list[str] = Field(default_factory=list)
+
+
+class TransportationLegPlan(BaseModel):
+    """Coordinator-facing transport plan for one movement between places."""
+
+    origin_name: str
+    destination_name: str
+    recommendation: TransportRecommendation
+    coordinator_summary: str
+    recommended_mode: TransportMode
+    estimated_duration_minutes: float = Field(ge=0)
+    estimated_cost: TransportCostEstimate | None = None
+    alternatives: list[TransportOption] = Field(default_factory=list)
+    budget_notes: list[str] = Field(default_factory=list)
+    rental_car_relevance: str | None = None
+    uncertainty_notes: list[str] = Field(default_factory=list)
+
+
+class TransportationAgentOutput(BaseModel):
+    """Structured output returned when the Transportation Agent is used as a tool."""
+
+    summary: str
+    legs: list[TransportationLegPlan]
+    recommended_modes: list[TransportMode] = Field(default_factory=list)
+    rental_car_relevance: str | None = None
+    budget_notes: list[str] = Field(default_factory=list)
+    itinerary_constraints: list[str] = Field(default_factory=list)
+    unresolved_questions: list[str] = Field(default_factory=list)
+    uncertainty_notes: list[str] = Field(default_factory=list)

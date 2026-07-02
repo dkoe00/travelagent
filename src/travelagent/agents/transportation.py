@@ -5,6 +5,7 @@ from __future__ import annotations
 from agents import Agent, Tool
 
 from travelagent.config import AppConfig
+from travelagent.schemas.transportation import TransportationAgentOutput
 from travelagent.tools.geocode import build_geocode_location_tool
 from travelagent.tools.routing import (
     build_compare_transport_options_tool,
@@ -17,6 +18,10 @@ You are the Transportation Agent in a multi-agent travel planning system.
 Your responsibility is to help the rest of the system decide how the user can
 sensibly move between two places. Optimize for practical recommendations, not
 just shortest theoretical travel time.
+
+You are normally called as a tool by the Coordinator after destinations and
+points of interest have already been identified. Treat named places in the
+request as the intended route stops unless they are ambiguous.
 
 When given an origin and destination:
 - Identify or confirm the locations before making route claims.
@@ -43,6 +48,16 @@ When comparing options:
 - Explain why an option wins, not just what it is.
 - Do not hide material uncertainty, ambiguous geocoding, missing live prices,
   missing public transport data, or assumptions from Budget.
+
+When returning your final answer, use the structured output schema:
+- Put one TransportationLegPlan in legs for each movement you evaluated.
+- Put the best option for each leg in recommendation.recommended_option.
+- Put useful alternatives in alternatives, not in prose only.
+- Use budget_notes for cost caveats that the Coordinator must preserve.
+- Use itinerary_constraints for constraints such as long transfer time, walking
+  burden, airport/station buffer, or rental-car implications.
+- Use unresolved_questions when the Coordinator needs to ask the user or another
+  agent for missing context.
 
 Return concise, decision-oriented transportation guidance that the Coordinator
 or Itinerary Planner can use directly.
@@ -75,4 +90,5 @@ def build_transportation_agent(
         instructions=_INSTRUCTIONS,
         tools=tools,
         handoffs=[],
+        output_type=TransportationAgentOutput,
     )
