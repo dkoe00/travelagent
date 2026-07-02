@@ -59,6 +59,8 @@ class AppConfig:
     llm_model: str = "gpt-5-nano"
     enable_tracing: bool = False
     language: str = "de"
+    tavily_api_key: str | None = field(default=None, repr=False)
+    google_places_api_key: str | None = field(default=None, repr=False)
 
 
 APP_CONFIG = AppConfig(
@@ -67,4 +69,6 @@ APP_CONFIG = AppConfig(
     llm_model=_empty_to_none(os.getenv("LLM_MODEL")) or "gpt-5-nano",
     enable_tracing=_parse_bool(os.getenv("ENABLE_TRACING"), default=False),
     language=_parse_language(os.getenv("LANGUAGE"), default="de"),
+    tavily_api_key=_empty_to_none(os.getenv("TAVILY_API_KEY")),
+    google_places_api_key=_empty_to_none(os.getenv("GOOGLE_PLACES_API_KEY")),
 )

@@ -9,6 +9,7 @@ dependencies = [
     "openai-agents>=0.17.6",
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
+    "tavily-python>=0.7.26",
 ]
 
 [build-system]

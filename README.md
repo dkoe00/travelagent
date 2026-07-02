@@ -98,6 +98,8 @@ LLM_BASE_URL=your_optional_custom_endpoint_here
 LLM_MODEL=your_model_name_here
 ENABLE_TRACING=false
 LANGUAGE=de  # de (German) or en (English) — defaults to de
+TAVILY_API_KEY=your_tavily_key_here          # free tier at https://tavily.com
+GOOGLE_PLACES_API_KEY=your_google_key_here   # Places API (New), needs a billed Google Cloud project
 ```
 
 Do not commit `.env` or any real API keys.

@@ -2,6 +2,7 @@ from agents import Runner
 
 from travelagent.agents.coordinator import build_coordinator_agent
 from travelagent.config import APP_CONFIG
+from travelagent.progress import ProgressHooks
 from travelagent.runtime import configure_agents_sdk
 
 _UI = {
@@ -64,11 +65,12 @@ def main() -> None:
     configure_agents_sdk(APP_CONFIG)
     agent = build_coordinator_agent(APP_CONFIG)
     ui = _UI[APP_CONFIG.language]
+    hooks = ProgressHooks(language=APP_CONFIG.language)
 
     brief = collect_brief(ui)
     print("\n" + "─" * 40 + "\n")
 
-    result = Runner.run_sync(agent, brief)
+    result = Runner.run_sync(agent, brief, hooks=hooks)
     print(f"\n{result.final_output}\n")
 
     while True:
@@ -85,6 +87,7 @@ def main() -> None:
         result = Runner.run_sync(
             agent,
             result.to_input_list() + [{"role": "user", "content": user_input}],
+            hooks=hooks,
         )
         print(f"\n{result.final_output}\n")
 
