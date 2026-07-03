@@ -106,11 +106,47 @@ Do not commit `.env` or any real API keys.
 
 ## Running the App
 
-Run the current terminal app with:
+### Terminal CLI (original)
+
+Run the terminal-based app with:
 
 ```bash
 uv run python main.py
 ```
+
+### Web Frontend
+
+Start the FastAPI backend (port 8000):
+
+```bash
+uv run uvicorn travelagent.api.app:app --reload --port 8000
+```
+
+In another terminal, start the Vite frontend dev server (port 5173):
+
+```bash
+cd frontend
+npm run dev
+```
+
+Then open http://localhost:5173 in your browser.
+
+**Architecture**: The FastAPI backend wraps the existing Coordinator agent and streams agent events (tool calls, text deltas) to the frontend via Server-Sent Events (SSE). The frontend renders a two-pane chat UI:
+- Left: conversation with the Coordinator; specialized tool outputs (destination suggestions, places groups, itineraries) render as interactive cards
+- Right: sidebar showing detected constraints (region, activity, duration, month, budget), pipeline progress (Constraints → Destination → Places → Itinerary), and recent tool-call log
+
+**SSE Event Vocabulary** (emitted by `travelagent/api/events.py`):
+| Event | Payload |
+|-------|---------|
+| `text_delta` | `{"delta": str}` — streamed coordinator text |
+| `tool_started` | `{"tool": str, "arguments": str}` — coordinator called a specialist tool |
+| `tool_finished` | `{"tool": str, "payload": any}` — tool returned (parsed JSON or structured output) |
+| `constraints` | `{"region": ..., ...}` — constraint update |
+| `final` | `{"text": str}` — final synthesized message |
+| `error` | `{"message": str}` — run failure |
+| `done` | `{}` — stream ended |
+
+The streaming uses the SDK's `Runner.run_streamed()` + `stream_events()` (SDK-provided); SSE translation and session management are project-implemented.
 
 ## Project Status
 

@@ -14,6 +14,7 @@ export default function App(): JSX.Element {
           messages={session.messages}
           runningTool={session.runningTool}
           busy={session.busy}
+          error={session.error}
           onSend={session.sendMessage}
           onSelectDestination={(name) => session.sendMessage(`Ich nehme ${name}`)}
         />
