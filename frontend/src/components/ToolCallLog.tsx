@@ -1,4 +1,4 @@
-import { ToolLogEntry } from "@/lib/types"
+import type { ToolLogEntry } from "@/lib/types"
 
 export interface ToolCallLogProps {
   toolLog: ToolLogEntry[]

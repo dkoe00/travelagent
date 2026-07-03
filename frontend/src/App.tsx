@@ -7,7 +7,7 @@ export default function App(): JSX.Element {
   const session = useChatSession()
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-background dark">
       <Header onNewChat={session.newChat} />
       <div className="flex-1 flex overflow-hidden max-w-5xl mx-auto w-full">
         <ChatPanel

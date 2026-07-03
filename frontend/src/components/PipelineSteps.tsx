@@ -1,5 +1,5 @@
 import { CheckCircle2, Loader2, Circle } from "lucide-react"
-import { PipelineStep, StepState } from "@/lib/types"
+import type { PipelineStep, StepState } from "@/lib/types"
 
 const STEP_LABELS: Record<PipelineStep, string> = {
   constraints: "Constraints",

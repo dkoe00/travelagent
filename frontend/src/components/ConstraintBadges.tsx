@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import { Constraints } from "@/lib/types"
+import type { Constraints } from "@/lib/types"
 
 const CONSTRAINT_LABELS: Record<string, string> = {
   region: "Region",
@@ -22,7 +22,7 @@ export function ConstraintBadges({ constraints }: ConstraintBadgesProps): JSX.El
           const displayValue =
             key === "duration_days" ? `${value} Tage` : String(value)
           return (
-            <Badge key={key} variant="secondary">
+            <Badge key={key} className="bg-teal-600 text-white hover:bg-teal-700">
               {label}: {displayValue}
             </Badge>
           )

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
-import { DestinationList } from "@/lib/types"
+import type { DestinationList } from "@/lib/types"
 
 export interface DestinationCardsProps {
   destinations: DestinationList
@@ -26,7 +26,7 @@ export function DestinationCards({
             <p className="text-sm text-muted-foreground mt-1">{dest.why}</p>
             <div className="flex flex-wrap gap-2 mt-2">
               {dest.tags.map((tag, tidx) => (
-                <Badge key={tidx} variant="secondary" className="text-xs">
+                <Badge key={tidx} className="text-xs bg-blue-500/70 text-white hover:bg-blue-500">
                   {tag}
                 </Badge>
               ))}

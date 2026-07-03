@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
-import { Itinerary } from "@/lib/types"
+import type { Itinerary } from "@/lib/types"
 
 const TIME_LABELS: Record<string, string> = {
   morning: "Vormittag",
@@ -24,7 +24,7 @@ export function ItineraryView({ itinerary }: ItineraryViewProps): JSX.Element {
           <div className="space-y-2">
             {day.stops.map((stop, idx) => (
               <div key={idx} className="flex gap-3 text-sm">
-                <Badge variant="outline" className="shrink-0 whitespace-nowrap">
+                <Badge className="shrink-0 whitespace-nowrap bg-amber-600 text-white hover:bg-amber-700">
                   {TIME_LABELS[stop.time_of_day] || stop.time_of_day}
                 </Badge>
                 <div>

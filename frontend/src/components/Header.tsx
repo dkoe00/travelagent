@@ -19,7 +19,7 @@ export function Header({ onNewChat }: HeaderProps): JSX.Element {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Badge variant="secondary">Coordinator aktiv</Badge>
+        <Badge className="bg-green-600/80 text-white hover:bg-green-600">Coordinator aktiv</Badge>
         <Button variant="outline" size="sm" onClick={onNewChat}>
           Neuer Chat
         </Button>

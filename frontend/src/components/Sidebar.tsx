@@ -1,5 +1,5 @@
 import { Separator } from "@/components/ui/separator"
-import { ChatMessage, Constraints, PipelineStep, StepState, ToolLogEntry } from "@/lib/types"
+import type { Constraints, PipelineStep, StepState, ToolLogEntry } from "@/lib/types"
 import { ConstraintBadges } from "./ConstraintBadges"
 import { PipelineSteps } from "./PipelineSteps"
 import { ToolCallLog } from "./ToolCallLog"

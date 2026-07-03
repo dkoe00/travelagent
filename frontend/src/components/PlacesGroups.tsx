@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import { PlacesPool } from "@/lib/types"
+import type { PlacesPool } from "@/lib/types"
 
 const KIND_LABELS: Record<string, string> = {
   activity: "Aktivitäten",
@@ -38,7 +38,7 @@ export function PlacesGroups({ pool }: PlacesGroupsProps): JSX.Element {
                 </div>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {place.tags.map((tag, tidx) => (
-                    <Badge key={tidx} variant="secondary" className="text-xs">
+                    <Badge key={tidx} className="text-xs bg-purple-500/70 text-white hover:bg-purple-500">
                       {tag}
                     </Badge>
                   ))}
