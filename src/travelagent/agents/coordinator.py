@@ -114,6 +114,8 @@ def build_coordinator_agent(config) -> Agent:
     language_line = _LANGUAGE_DIRECTIVE.get(config.language, _LANGUAGE_DIRECTIVE["de"])
     instructions = _INSTRUCTIONS + f"\n## Language\n\n{language_line}\n"
 
+    """Build the Coordinator Agent for the terminal-only prototype."""
+    # TODO @dkoe00: Wire transportation and budget agents.
     return Agent(
         name="Coordinator Agent",
         model=config.llm_model,

@@ -61,6 +61,12 @@ class AppConfig:
     language: str = "de"
     tavily_api_key: str | None = field(default=None, repr=False)
     google_places_api_key: str | None = field(default=None, repr=False)
+    nominatim_base_url: str = "https://nominatim.openstreetmap.org/search"
+    nominatim_user_agent: str = "travelagent-private-planner/0.1"
+    nominatim_email: str | None = None
+    nominatim_timeout_seconds: float = 10.0
+    osrm_base_url: str = "https://router.project-osrm.org/route/v1"
+    osrm_timeout_seconds: float = 10.0
 
 
 APP_CONFIG = AppConfig(
@@ -71,4 +77,23 @@ APP_CONFIG = AppConfig(
     language=_parse_language(os.getenv("LANGUAGE"), default="de"),
     tavily_api_key=_empty_to_none(os.getenv("TAVILY_API_KEY")),
     google_places_api_key=_empty_to_none(os.getenv("GOOGLE_PLACES_API_KEY")),
+    nominatim_base_url=(
+        _empty_to_none(os.getenv("NOMINATIM_BASE_URL"))
+        or "https://nominatim.openstreetmap.org/search"
+    ),
+    nominatim_user_agent=(
+        _empty_to_none(os.getenv("NOMINATIM_USER_AGENT"))
+        or "travelagent-private-planner/0.1"
+    ),
+    nominatim_email=_empty_to_none(os.getenv("NOMINATIM_EMAIL")),
+    nominatim_timeout_seconds=float(
+        _empty_to_none(os.getenv("NOMINATIM_TIMEOUT_SECONDS")) or "10"
+    ),
+    osrm_base_url=(
+        _empty_to_none(os.getenv("OSRM_BASE_URL"))
+        or "https://router.project-osrm.org/route/v1"
+    ),
+    osrm_timeout_seconds=float(
+        _empty_to_none(os.getenv("OSRM_TIMEOUT_SECONDS")) or "10"
+    ),
 )
