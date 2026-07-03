@@ -10,6 +10,9 @@ from travelagent.config import AppConfig
 
 def configure_agents_sdk(config: AppConfig) -> None:
     """Configure the OpenAI Agents SDK from application settings."""
+    if not config.enable_tracing:
+        agents.set_tracing_disabled(True)
+
     if config.llm_api_key:
         agents.set_default_openai_key(
             config.llm_api_key,
