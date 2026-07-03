@@ -4,6 +4,7 @@ from travelagent.agents.destination import build_destination_agent
 from travelagent.agents.itinerary import build_itinerary_agent
 from travelagent.agents.places import build_places_agent
 from travelagent.progress import ProgressHooks
+from travelagent.tools.constraints import update_constraints
 
 _INSTRUCTIONS = """
 You are the Coordinator for a travel planning assistant. You are the only agent that
@@ -86,6 +87,13 @@ Use this structure when presenting the results of plan_itinerary():
 Repeat for every day. Keep it scannable — short lines, no long paragraphs.
 End with a short invitation for follow-up adjustments.
 
+## Constraint reporting
+
+Whenever you learn or revise a trip constraint (region, activity, duration,
+month, budget), call `update_constraints` with the fields you currently know
+before responding or calling other tools. This keeps the UI in sync; it does
+not replace asking the user clarifying questions.
+
 ## Rules
 
 - Never do specialist work yourself. Always use discover_destinations, find_places, or plan_itinerary.
@@ -121,6 +129,7 @@ def build_coordinator_agent(config) -> Agent:
         model=config.llm_model,
         instructions=instructions,
         tools=[
+            update_constraints,
             destination_agent.as_tool(
                 tool_name="discover_destinations",
                 tool_description=(
