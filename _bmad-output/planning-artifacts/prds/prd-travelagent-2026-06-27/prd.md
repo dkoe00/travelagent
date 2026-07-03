@@ -2,24 +2,24 @@
 title: 'travelagent PRD'
 status: 'draft'
 created: '2026-06-27'
-updated: '2026-06-27'
+updated: '2026-07-02'
 ---
 
 # PRD: travelagent
 
 ## 0. Document Purpose
 
-This PRD defines the scope for `travelagent`, a Python-based seminar prototype of a multi-agent travel planning assistant built with the OpenAI Agents SDK. The document is for the implementation team preparing a 10-minute university seminar presentation on LLM-based agentic systems and multi-agent systems. It prioritizes requirements that make the SDK usage observable and discussable, especially handoffs, tool calls, extensibility, and development experience.
+This PRD defines the scope for `travelagent`, a Python-based multi-agent travel planning assistant built with the OpenAI Agents SDK. The project began as a seminar prototype for a 10-minute university presentation on LLM-based agentic systems and multi-agent systems, but the product goal has changed: the team now intends to keep developing the tool for practical private trip planning after the seminar.
 
-The PRD is not a product-launch plan. It captures a functional prototype sufficient to support credible presentation observations about the OpenAI Agents SDK. Technical implementation details beyond product requirements should remain in architecture or implementation notes.
+This PRD still captures the seminar-facing MVP, but it should no longer be read as the final product boundary. Implementation decisions should preserve a path toward a usable personal travel planner, especially around real data integrations, budget accuracy, transport reliability, and extensible specialist-agent workflows.
 
 ## 1. Vision
 
-`travelagent` should demonstrate how a multi-agent system can break a travel planning request into specialized subtasks, coordinate the outputs, and return a coherent travel recommendation. The system should cover several meaningful aspects of travel planning, including itinerary planning, transportation and route choices, packing guidance, and supporting contextual information.
+`travelagent` should demonstrate and then operationalize how a multi-agent system can break a travel planning request into specialized subtasks, coordinate the outputs, and return a coherent travel recommendation. The system should cover several meaningful aspects of travel planning, including itinerary planning, transportation and route choices, packing guidance, budget feasibility, places, and supporting contextual information.
 
-The main value is not the travel plan itself, but the learning and evaluation surface it creates. The prototype should give the team concrete experience with the OpenAI Agents SDK: how agents are defined, how handoffs work in practice, how tools are called, how easy the system is to extend, and where the framework is strong or awkward.
+For the seminar milestone, a major value is the learning and evaluation surface it creates. After that milestone, the travel plan itself becomes a real product outcome: recommendations should become accurate enough, transparent enough, and ergonomic enough to support private trip planning.
 
-For the seminar, there will be no required live demo. The system still needs to work well enough that the team can honestly describe what was implemented, what worked, what was difficult, and whether they would choose the framework again.
+For the seminar, there will be no required live demo. The system still needs to work well enough that the team can honestly describe what was implemented, what worked, what was difficult, and whether they would choose the framework again. Post-seminar work should replace controlled MVP approximations with stronger data sources and more complete planning behavior.
 
 ## 2. Target User
 
@@ -28,19 +28,19 @@ For the seminar, there will be no required live demo. The system still needs to 
 - As a seminar team member, understand how the OpenAI Agents SDK supports a concrete multi-agent use case.
 - As a presenter, explain the agent architecture and framework usage clearly within a 10-minute presentation.
 - As an evaluator of the SDK, observe which features are useful, missing, difficult, or manually implemented.
-- As a prototype user, provide a travel request and receive a coherent travel plan assembled from multiple specialist contributions.
+- As a private traveler, provide a travel request and receive a coherent travel plan assembled from multiple specialist contributions.
 
 ### 2.2 Non-Users (v1)
 
-- Real travelers relying on the system for production-grade booking, safety, pricing, or route accuracy.
+- Travelers relying on the system for booking, payment, safety-critical, emergency, visa, legal, or medical advice.
 - Users expecting live travel inventory, booking flows, real-time disruptions, or guaranteed factual travel data.
-- Stakeholders expecting continued product development after the seminar.
 
 ### 2.3 Key User Journeys
 
 - **UJ-1. Paul prepares evidence for the seminar presentation.** Paul, a seminar participant, runs or inspects the prototype before preparing slides. He wants to see the full planned agent set, working handoffs, and working tool calls so the presentation can discuss real framework experience rather than only planned architecture.
 - **UJ-2. A prototype user asks for a city trip plan.** A user provides a travel request with destination, duration, preferences, and constraints. The Coordinator Agent identifies the needed subtasks, delegates to specialist agents, uses tool-backed context where available, and returns a combined response with itinerary, transport guidance, and packing recommendations.
 - **UJ-3. The team extends the system with another capability.** A team member adds or refines a Specialist Agent or API-backed tool and observes how much boilerplate, manual wiring, and SDK-specific knowledge are required. The result feeds the presentation's framework usage and lessons-learned sections.
+- **UJ-4. The team plans a private trip.** A team member uses the assistant to compare transportation options, estimate trip costs, evaluate places, and assemble a practical itinerary. The system should make uncertainties visible when data is approximate or incomplete.
 
 ## 3. Glossary
 
@@ -55,7 +55,7 @@ For the seminar, there will be no required live demo. The system still needs to 
 - **Handoff** — An OpenAI Agents SDK mechanism by which one agent delegates part of a task to another agent.
 - **Tool Call** — A model-initiated call to a provided function or tool, used here primarily to access travel-relevant data from existing open or public APIs where feasible.
 - **External Data Tool** — A tool wrapper around an existing open or public API for weather, places, geocoding, routing, currency, or cost-related data.
-- **Fallback Data** — A small controlled local dataset or deterministic fallback used only when an external API is unavailable, unsuitable, or too costly for the seminar prototype.
+- **Fallback Data** — A small controlled local dataset or deterministic fallback used when an external API is unavailable, unsuitable, too costly, or inappropriate for automated tests.
 - **Travel Plan** — The final user-facing response assembled from specialist outputs.
 - **Seminar Presentation** — The 10-minute presentation focused on use case, architecture, framework usage, observations, lessons learned, conclusion, and recommendations.
 
@@ -119,7 +119,7 @@ The implementation must make it possible for the team to inspect and explain how
 
 ### 4.3 SDK Tool Calls and External Data
 
-**Description:** Tool calls must work in the prototype because they are another central SDK feature. Tools should preferably wrap existing open or public APIs for travel-relevant data, with Fallback Data allowed when an API is unavailable, unsuitable, or outside the seminar prototype's effort budget. Realizes UJ-1 and UJ-2.
+**Description:** Tool calls must work because they are a central SDK feature and the main path to useful travel data. Tools should preferably wrap existing open or public APIs for travel-relevant data, with Fallback Data allowed when an API is unavailable, unsuitable, too costly, or inappropriate for deterministic tests. Realizes UJ-1, UJ-2, and UJ-4.
 
 **Functional Requirements:**
 
@@ -204,12 +204,12 @@ The system uses environment variables for LLM configuration and tracing settings
 
 ## 5. Non-Goals (Explicit)
 
-- No production travel booking, reservation, payment, or ticketing workflow.
-- No live travel inventory, real-time route disruptions, guaranteed weather accuracy, or authoritative pricing.
+- No travel booking, reservation, payment, or ticketing workflow.
+- No safety-critical travel advice, emergency planning, legal, visa, or medical guidance.
+- No guarantee of live inventory, real-time disruption coverage, weather accuracy, or authoritative pricing until those providers are explicitly integrated and validated.
 - No requirement for a live demo during the seminar presentation.
-- No web UI, mobile app, account system, persistence layer, or deployment pipeline for MVP.
-- No post-seminar product roadmap unless the team later changes the project goal.
-- No claim that travel recommendations are safe, complete, or suitable for real-world reliance.
+- No web UI, mobile app, account system, persistence layer, or deployment pipeline for the seminar MVP.
+- No claim that recommendations are complete or suitable for high-stakes reliance.
 
 ## 6. MVP Scope
 
@@ -218,19 +218,19 @@ The system uses environment variables for LLM configuration and tracing settings
 - Python-based terminal prototype using the OpenAI Agents SDK.
 - Coordinator Agent plus all five fixed Specialist Agents: Packing List, Places, Transportation, Budget, and Itinerary Planner.
 - Working SDK handoffs for agent delegation.
-- Working SDK tool calls using External Data Tools where feasible, with Fallback Data allowed to protect seminar scope.
+- Working SDK tool calls using External Data Tools where feasible, with Fallback Data allowed for testing and early incomplete provider coverage.
 - Travel Plan output covering itinerary, places, transportation or routes, budget, and packing.
 - Environment-based LLM configuration compatible with the existing project setup.
-- Enough implementation notes or observable behavior to support the seminar presentation checklist.
+- Enough implementation notes or observable behavior to support the seminar presentation checklist and future development decisions.
 
 ### 6.2 Out of Scope for MVP
 
-- Production-grade travel data integrations or guaranteed API completeness.
-- UI beyond terminal execution.
+- Production-grade travel data integrations or guaranteed API completeness for the seminar MVP.
+- UI beyond terminal execution for the seminar MVP.
 - Authentication, user profiles, saved trips, or long-term memory.
 - Automated slide generation.
 - Comprehensive evaluation benchmark across many frameworks.
-- Full scalability implementation for large dynamic multi-agent systems; only reasoned assessment from prototype experience is required.
+- Full scalability implementation for large dynamic multi-agent systems during the seminar MVP.
 
 ## 7. Success Metrics
 
@@ -248,8 +248,8 @@ The system uses environment variables for LLM configuration and tracing settings
 
 **Counter-metrics (do not optimize)**
 
-- **SM-C1:** Travel realism should not be optimized at the expense of SDK observability. The prototype exists to evaluate framework usage, not to be the best travel planner.
-- **SM-C2:** Architecture complexity should not be optimized upward. More agents are only useful if they improve the seminar's evaluation evidence.
+- **SM-C1:** For the seminar milestone, travel realism should not be optimized at the expense of SDK observability.
+- **SM-C2:** Architecture complexity should not be optimized upward without a concrete planning benefit or development benefit.
 
 ## 8. Presentation Alignment
 
@@ -278,11 +278,11 @@ The implementation should also prepare answers to these checklist questions:
 
 - Keep secrets in `.env`; never commit real API keys.
 - Prefer existing open or public APIs over self-built mock tools where setup effort and reliability are acceptable.
-- Keep a small Fallback Data path available when an external API would make the seminar prototype fragile.
+- Keep a small Fallback Data path available when an external API would make tests or early development fragile.
 - Keep the implementation aligned with the existing `src/travelagent/` package layout.
 - Avoid hard-coding model names in agents; use runtime configuration.
 - Do not wire tools into the Coordinator Agent without updating instructions that currently say not to use tools.
-- Treat the project as a bounded seminar prototype, not an expandable product platform.
+- Treat the seminar MVP as the first milestone of an expandable private travel planning tool.
 
 ## 10. Open Questions
 

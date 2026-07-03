@@ -1,7 +1,7 @@
 ---
 project_name: 'travelagent'
 user_name: 'Paul'
-date: '2026-06-27'
+date: '2026-07-02'
 sections_completed: ['technology_stack', 'language_specific_rules', 'framework_specific_rules', 'testing_rules', 'code_quality_style_rules', 'development_workflow_rules', 'critical_dont_miss_rules']
 existing_patterns_found: 8
 status: 'complete'
@@ -78,7 +78,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Keep local secrets in `.env`; update `.env.example` when adding required configuration variables.
 - Do not commit `.env` or real API keys.
 - No branch naming, commit message, PR, CI, or deployment conventions are defined in the repository yet; do not fabricate them in implementation guidance.
-- Treat the project as an early prototype for a university seminar: optimize changes for clarity, demonstrability, and controlled evaluation of the Agents SDK.
+- Treat the project as a private travel planning tool that began as a university seminar prototype: optimize near-term changes for clarity and demonstrability while preserving a path to practical real-world use.
 
 ### Critical Don't-Miss Rules
 
@@ -87,7 +87,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Do not make automated tests depend on live LLM responses or live external APIs; use deterministic seams around configuration, schema validation, tool wrappers, and fallback data.
 - Do not wire tools into the Coordinator Agent without also updating its instructions; it currently explicitly says `Do not use tools.`
 - Do not replace the planned multi-agent architecture with a single large agent unless the README and project context are intentionally updated.
-- Do not add fragile travel-data integrations without stable tool interfaces, schema boundaries, and fallback behavior for unavailable APIs.
+- Do not add fragile travel-data integrations without stable tool interfaces, schema boundaries, fallback behavior for unavailable APIs, and concise `TODO @dkoe00:` comments where MVP shortcuts must later be replaced.
 - Do not log full environment-derived configuration objects if secrets may be present.
 - Do not treat placeholder modules as dead code; they mark intended project boundaries for upcoming specialist agents, schemas, and tools.
 
@@ -109,4 +109,4 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - Review periodically for outdated rules.
 - Remove rules that become obvious over time.
 
-Last Updated: 2026-06-27
+Last Updated: 2026-07-02
