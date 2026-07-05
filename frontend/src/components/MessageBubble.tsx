@@ -31,7 +31,7 @@ export function MessageBubble({
   return (
     <div className="flex gap-2">
       <Avatar className="w-6 h-6 shrink-0">
-        <AvatarFallback>
+        <AvatarFallback className="bg-blue-500/15 text-blue-400">
           <Route className="w-4 h-4" />
         </AvatarFallback>
       </Avatar>

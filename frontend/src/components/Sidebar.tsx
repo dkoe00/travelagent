@@ -16,7 +16,7 @@ export function Sidebar({
   toolLog,
 }: SidebarProps): JSX.Element {
   return (
-    <aside className="w-64 shrink-0 border-l overflow-y-auto p-4">
+    <aside className="w-64 shrink-0 border-l overflow-y-auto p-4 bg-neutral-950">
       <div className="space-y-6">
         <div>
           <h3 className="text-xs font-semibold text-muted-foreground mb-2">
