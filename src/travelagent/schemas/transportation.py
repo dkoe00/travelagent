@@ -110,11 +110,51 @@ class TransportationLegPlan(BaseModel):
     uncertainty_notes: list[str] = Field(default_factory=list)
 
 
+class TransportAreaCluster(BaseModel):
+    """Places that are sensible to schedule together."""
+
+    name: str
+    places: list[str]
+    reason: str
+    suggested_day_count: int = Field(ge=1)
+
+
+class TransportSequenceConstraint(BaseModel):
+    """Ordering or grouping constraint for itinerary planning."""
+
+    places: list[str]
+    constraint: str
+    reason: str
+
+
+class TransferBuffer(BaseModel):
+    """Minimum time to reserve between two places."""
+
+    from_place: str
+    to_place: str
+    minimum_minutes: float = Field(ge=0)
+    recommended_mode: TransportMode
+    reason: str
+
+
+class LongTransferWarning(BaseModel):
+    """Warning for a pair of places that should not be combined casually."""
+
+    from_place: str
+    to_place: str
+    estimated_minutes: float = Field(ge=0)
+    reason: str
+
+
 class TransportationAgentOutput(BaseModel):
     """Structured output returned when the Transportation Agent is used as a tool."""
 
     summary: str
     legs: list[TransportationLegPlan]
+    area_clusters: list[TransportAreaCluster] = Field(default_factory=list)
+    sequence_constraints: list[TransportSequenceConstraint] = Field(default_factory=list)
+    transfer_buffers: list[TransferBuffer] = Field(default_factory=list)
+    long_transfer_warnings: list[LongTransferWarning] = Field(default_factory=list)
     recommended_modes: list[TransportMode] = Field(default_factory=list)
     rental_car_relevance: str | None = None
     budget_notes: list[str] = Field(default_factory=list)
