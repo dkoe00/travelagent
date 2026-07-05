@@ -69,6 +69,22 @@ class AppConfig:
     osrm_timeout_seconds: float = 10.0
 
 
+def validate_runtime_requirements(config: AppConfig) -> None:
+    """Fail fast when required runtime configuration is missing."""
+    missing: list[str] = []
+    if not config.llm_api_key:
+        missing.append("LLM_API_KEY")
+    if not config.tavily_api_key:
+        missing.append("TAVILY_API_KEY")
+
+    if missing:
+        names = ", ".join(missing)
+        raise RuntimeError(
+            f"Missing required environment variable(s): {names}. "
+            "Create or update .env from .env.example before running the app."
+        )
+
+
 APP_CONFIG = AppConfig(
     llm_api_key=_empty_to_none(os.getenv("LLM_API_KEY")),
     llm_base_url=_empty_to_none(os.getenv("LLM_BASE_URL")),

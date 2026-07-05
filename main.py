@@ -1,7 +1,7 @@
 from agents import Runner
 
 from travelagent.agents.coordinator import build_coordinator_agent
-from travelagent.config import APP_CONFIG
+from travelagent.config import APP_CONFIG, validate_runtime_requirements
 from travelagent.progress import ProgressHooks
 from travelagent.runtime import configure_agents_sdk
 
@@ -62,6 +62,7 @@ def collect_brief(ui: dict) -> str:
 
 
 def main() -> None:
+    validate_runtime_requirements(APP_CONFIG)
     configure_agents_sdk(APP_CONFIG)
     agent = build_coordinator_agent(APP_CONFIG)
     ui = _UI[APP_CONFIG.language]
