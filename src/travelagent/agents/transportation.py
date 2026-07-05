@@ -5,6 +5,7 @@ from __future__ import annotations
 from agents import Agent, Tool
 
 from travelagent.config import AppConfig
+from travelagent.agents.budget import build_budget_agent
 from travelagent.schemas.transportation import TransportationAgentOutput
 from travelagent.tools.geocode import build_geocode_location_tool
 from travelagent.tools.routing import (
@@ -66,8 +67,8 @@ or Itinerary Planner can use directly.
 
 def build_transportation_agent(
     config: AppConfig,
-    budget_agent: Agent[object],
 ) -> Agent[object]:
+    budget_agent = build_budget_agent(config)
     tools: list[Tool] = [
         build_geocode_location_tool(config),
         build_estimate_route_tool(config),

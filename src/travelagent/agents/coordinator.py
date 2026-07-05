@@ -3,6 +3,7 @@ from agents import Agent
 from travelagent.agents.destination import build_destination_agent
 from travelagent.agents.itinerary import build_itinerary_agent
 from travelagent.agents.places import build_places_agent
+from travelagent.agents.transportation import build_transportation_agent
 from travelagent.progress import ProgressHooks
 
 _INSTRUCTIONS = """
@@ -32,9 +33,11 @@ type, or vibe (e.g. "Küste in Europa", "irgendwo zum Wandern"):
 
 **Building the itinerary** — once the user has reacted to the places (confirmed, or
 gave wishes/adjustments) after either entry point above:
-1. Call plan_itinerary() with the destination, duration, the full places pool you
+1. Call calculate_routes() with the destination, duration, the full places pool you
    received from find_places(), and a summary of what the user said.
-2. Present the day-by-day plan using the itinerary format below.
+2. Call plan_itinerary() with the destination, duration, the full places pool, the
+   transportation guidance from calculate_routes(), and a summary of what the user said.
+3. Present the day-by-day plan using the itinerary format below.
 
 ## How to call the tools
 
@@ -54,7 +57,16 @@ plan_itinerary — pass a structured English brief:
   "Destination: Lisbon, Portugal
    Duration: 5 days
    Places pool: [list every place from find_places() with kind, name, area]
+   Transportation guidance: [summary from calculate_routes()]
    User wishes: [what the user said after seeing the places, or "no specific wishes"]"
+
+calculate_routes — pass a structured English brief:
+  "Destination: Lisbon, Portugal
+   Duration: 5 days
+   Places pool: [list every place from find_places() with kind, name, area]
+   User wishes: [what the user said after seeing the places, or "no specific wishes"]
+   Task: compare sensible movement options between the relevant places and flag timing,
+   budget, walking burden, transfer, and rental-car implications"
 
 ## Output format for places
 
@@ -88,9 +100,12 @@ End with a short invitation for follow-up adjustments.
 
 ## Rules
 
-- Never do specialist work yourself. Always use discover_destinations, find_places, or plan_itinerary.
+- Never do specialist work yourself. Always use discover_destinations, find_places, calculate_routes, or plan_itinerary.
 - Never call find_places() before a concrete destination is established.
+- Never call calculate_routes() before find_places() has produced a places pool.
 - Never call plan_itinerary() before find_places() has run and the user has reacted to the places.
+- When building an itinerary, call calculate_routes() before plan_itinerary() so route
+  timing, cost, and comfort constraints can shape the schedule.
 - After presenting destination options, STOP and wait for the user's choice.
 - After presenting places, STOP and wait for the user's reaction before building the itinerary.
 - When the user picks a destination, call find_places() immediately — do not ask for more input first.
@@ -107,6 +122,7 @@ def build_coordinator_agent(config) -> Agent:
     destination_agent = build_destination_agent(config)
     places_agent = build_places_agent(config)
     itinerary_agent = build_itinerary_agent(config)
+    transportation_agent = build_transportation_agent(config)
     # as_tool() runs the sub-agent in a nested Runner call that does not inherit the
     # outer run's hooks — pass hooks explicitly so sub-agent tool calls stay visible.
     sub_agent_hooks = ProgressHooks(language=config.language)
@@ -115,7 +131,7 @@ def build_coordinator_agent(config) -> Agent:
     instructions = _INSTRUCTIONS + f"\n## Language\n\n{language_line}\n"
 
     """Build the Coordinator Agent for the terminal-only prototype."""
-    # TODO @dkoe00: Wire transportation and budget agents.
+    # TODO @dkoe00: Pass structured route output to itinerary.
     return Agent(
         name="Coordinator Agent",
         model=config.llm_model,
@@ -142,6 +158,17 @@ def build_coordinator_agent(config) -> Agent:
                 tool_description=(
                     "Turn a places pool into a day-by-day schedule. Use only after find_places() "
                     "has run and the user has reacted to the places."
+                ),
+                hooks=sub_agent_hooks,
+            ),
+            transportation_agent.as_tool(
+                tool_name="calculate_routes",
+                tool_description=(
+                    "Compare practical transportation options between the places already found by "
+                    "find_places(). Use after the user has reacted to the places and before "
+                    "plan_itinerary(). Returns route legs, recommended modes, useful alternatives, "
+                    "estimated durations and costs, walking/transfer burden, rental-car relevance, "
+                    "budget notes, and unresolved transportation questions."
                 ),
                 hooks=sub_agent_hooks,
             ),
