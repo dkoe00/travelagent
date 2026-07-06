@@ -17,61 +17,29 @@ The assistant is intended to create travel itineraries and packing lists while c
 - luggage constraints
 - feasibility of the overall plan
 
-## Two Entry Points, One Pipeline
+## Current Pipeline
 
 The assistant handles both **concrete** requests ("I want to go to Albania — what can I do there?") and **vague** ones ("I want to hike along the coast somewhere in Europe"). Both feed the same pipeline; the Coordinator interactively extracts constraints and decides where to enter.
 
-The pipeline is built as separable **building blocks**, each developed in isolation first. How the blocks ultimately communicate (`agent.as_tool()` vs `handoffs`) is deliberately left open until each block works on its own.
+The Coordinator stays the single conversational partner. It orchestrates specialists via the SDK's `agent.as_tool()` so specialist results return to the Coordinator.
 
 ```
 Vague input    → Destination Agent suggests candidates → [user picks one]
 Concrete input ───────────────────────────────────────────┐
                                                            ↓
-┌─ Block 1: Entry (vague → concrete) ──────────────────────────────┐
-│  Coordinator  +  Destination  +  Places → pool of POIs / stays   │
-└──────────────────────────────┬────────────────────────────────────┘
-                               ↓   (communication TBD)
-┌─ Block 2: Enrichment ────────────────────────────────────────────┐
-│  Itinerary Planner  ←→  Transportation  +  Budget                 │
-└──────────────────────────────┬────────────────────────────────────┘
-                               ↓
-                     (pipeline complete)
-                               ↓
-┌─ Independent, last (only if time) ───────────────────────────────┐
-│  Packing List → activity- and weather-aware list                  │
-└───────────────────────────────────────────────────────────────────┘
+Coordinator → Places Agent → pool of POIs / restaurants / stays
+            → Transportation Agent (+ Budget Agent internally)
+            → Itinerary Agent → transport-aware day-by-day plan
 ```
 
-Within Block 1, the Coordinator stays the single conversational partner. It orchestrates specialists via the SDK's `agent.as_tool()` (results return to the Coordinator), rather than transferring control via `handoffs`.
-
 ## Agent Architecture
-
-All agents are **core** except the Packing List, which is independent and optional.
-
-**Block 1 — Entry** (the vague → concrete flow):
 
 - **Coordinator Agent**: extracts constraints interactively, routes to the right entry point, orchestrates specialists, synthesizes the final response
 - **Destination Agent**: turns vague constraints into ranked candidate destinations
 - **Places Agent**: suggests activities, sights, accommodation, and restaurants for a destination
-
-**Block 2 — Enrichment** (the Itinerary Planner is the connective hub):
-
-- **Itinerary Planner Agent**: schedules the selected places into feasible day-by-day time blocks; works with Transportation and Budget to refine the plan
-- **Transportation Agent**: compares transport modes, estimates travel times and costs
-- **Budget Agent**: estimates costs, handles currencies, flags budget overruns
-
-**Independent** (built last, only if time allows):
-
-- **Packing List Agent**: fully self-contained; fetches weather itself and produces an activity- and weather-aware list once the pipeline is complete. Possible stretch: a small shadcn frontend reusing a chat component for a nicer UI.
-
-## Work Split
-
-- **Paul** — Block 1: Coordinator, Destination, and Places agents (the vague → concrete flow)
-- **Darius** — Transportation and Budget agents, developed in isolation first
-
-The Itinerary Planner connects the two blocks. How they integrate — and who owns the Itinerary Planner — is decided in a later phase, once Block 1 and the Transportation/Budget agents each work independently.
-
-The current implementation is an early work in progress focused on Block 1.
+- **Transportation Agent**: compares route options, estimates travel times and costs, returns clusters, sequencing constraints, transfer buffers, and long-transfer warnings for itinerary planning
+- **Budget Agent**: estimates transportation costs and explains cost assumptions; currently used by the Transportation Agent
+- **Itinerary Planner Agent**: schedules the selected places into feasible day-by-day time blocks using transportation guidance
 
 ## Tech Stack
 
@@ -80,7 +48,8 @@ The current implementation is an early work in progress focused on Block 1.
 - OpenAI Agents SDK
 - python-dotenv for local environment configuration
 - Pydantic for structured data models
-- *(possible stretch)* shadcn-based mini frontend reusing a chat component, primarily for the Packing List
+- Tavily for web-backed destination and places search
+- Nominatim and OSRM for early geocoding and route estimates
 
 ## Setup
 
@@ -90,16 +59,23 @@ Install dependencies with uv:
 uv sync
 ```
 
-Create a local `.env` file based on `.env.example` and configure the required LLM settings:
+Create a local `.env` file based on `.env.example`.
+
+Required for the current prototype:
 
 ```env
 LLM_API_KEY=your_api_key_here
+TAVILY_API_KEY=your_tavily_key_here
+```
+
+Optional:
+
+```env
 LLM_BASE_URL=your_optional_custom_endpoint_here
 LLM_MODEL=your_model_name_here
 ENABLE_TRACING=false
 LANGUAGE=de  # de (German) or en (English) — defaults to de
-TAVILY_API_KEY=your_tavily_key_here          # free tier at https://tavily.com
-GOOGLE_PLACES_API_KEY=your_google_key_here   # Places API (New), needs a billed Google Cloud project
+GOOGLE_PLACES_API_KEY=your_google_key_here   # future validation/enrichment path
 ```
 
 Do not commit `.env` or any real API keys.
@@ -114,13 +90,10 @@ uv run python main.py
 
 ## Project Status
 
-Project setup, runtime configuration, and the minimal Coordinator smoke test are done. Current focus is **Block 1**. Next planned steps:
+The current prototype wires Coordinator, Destination, Places, Transportation, Budget, and Itinerary agents into one terminal flow. The next planned steps are:
 
-1. Destination Agent (mock tool → wiring → real API)
-2. Places Agent (mock tool → wiring → real API)
-3. Coordinator wiring Destination + Places via `as_tool()`, with interactive constraint extraction
-4. Structured Pydantic outputs at the Block 1 agent boundaries
-5. *(in parallel, isolated)* Transportation and Budget agents
-6. Itinerary Planner as the connective hub, integrating the blocks
-7. *(only if time)* Packing List Agent with real weather data (Open-Meteo) + optional shadcn frontend
-8. End-to-end demo scenario for the seminar presentation
+1. Run and fix an end-to-end smoke test with a concrete destination.
+2. Improve final Coordinator presentation of transport and budget caveats.
+3. Add deterministic checks for agent construction and expected tool wiring.
+4. Replace heuristic routing/cost shortcuts with stronger providers over time.
+5. Future work: Packing Agent, Google Places validation, live prices, richer public transport data, and optional UI.

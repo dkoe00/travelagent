@@ -36,7 +36,8 @@ gave wishes/adjustments) after either entry point above:
 1. Call calculate_routes() with the destination, duration, the full places pool you
    received from find_places(), and a summary of what the user said.
 2. Call plan_itinerary() with the destination, duration, the full places pool, the
-   transportation guidance from calculate_routes(), and a summary of what the user said.
+   full structured transportation output from calculate_routes(), and a summary of what
+   the user said.
 3. Present the day-by-day plan using the itinerary format below.
 
 ## How to call the tools
@@ -57,7 +58,9 @@ plan_itinerary — pass a structured English brief:
   "Destination: Lisbon, Portugal
    Duration: 5 days
    Places pool: [list every place from find_places() with kind, name, area]
-   Transportation guidance: [summary from calculate_routes()]
+   Transportation guidance: [include the full calculate_routes result, especially
+   area_clusters, sequence_constraints, transfer_buffers, long_transfer_warnings,
+   itinerary_constraints, budget_notes, and uncertainty_notes]
    User wishes: [what the user said after seeing the places, or "no specific wishes"]"
 
 calculate_routes — pass a structured English brief:
@@ -65,8 +68,9 @@ calculate_routes — pass a structured English brief:
    Duration: 5 days
    Places pool: [list every place from find_places() with kind, name, area]
    User wishes: [what the user said after seeing the places, or "no specific wishes"]
-   Task: compare sensible movement options between the relevant places and flag timing,
-   budget, walking burden, transfer, and rental-car implications"
+   Task: return itinerary-planning transport guidance: area clusters, sensible sequence
+   constraints, transfer buffers, long-transfer warnings, route legs, budget notes,
+   walking burden, transfer burden, and rental-car implications"
 
 ## Output format for places
 
@@ -106,6 +110,9 @@ End with a short invitation for follow-up adjustments.
 - Never call plan_itinerary() before find_places() has run and the user has reacted to the places.
 - When building an itinerary, call calculate_routes() before plan_itinerary() so route
   timing, cost, and comfort constraints can shape the schedule.
+- Do not summarize away calculate_routes() before plan_itinerary(). Preserve the
+  structured fields that affect scheduling: area_clusters, sequence_constraints,
+  transfer_buffers, long_transfer_warnings, itinerary_constraints, and budget_notes.
 - After presenting destination options, STOP and wait for the user's choice.
 - After presenting places, STOP and wait for the user's reaction before building the itinerary.
 - When the user picks a destination, call find_places() immediately — do not ask for more input first.
@@ -156,8 +163,9 @@ def build_coordinator_agent(config) -> Agent:
             itinerary_agent.as_tool(
                 tool_name="plan_itinerary",
                 tool_description=(
-                    "Turn a places pool into a day-by-day schedule. Use only after find_places() "
-                    "has run and the user has reacted to the places."
+                    "Turn a places pool plus transportation guidance into a day-by-day schedule. "
+                    "Use only after find_places() has run, the user has reacted to the places, "
+                    "and calculate_routes() has returned route/clustering constraints."
                 ),
                 hooks=sub_agent_hooks,
             ),
@@ -166,7 +174,8 @@ def build_coordinator_agent(config) -> Agent:
                 tool_description=(
                     "Compare practical transportation options between the places already found by "
                     "find_places(). Use after the user has reacted to the places and before "
-                    "plan_itinerary(). Returns route legs, recommended modes, useful alternatives, "
+                    "plan_itinerary(). Returns route legs, area clusters, sequencing constraints, "
+                    "transfer buffers, long-transfer warnings, recommended modes, useful alternatives, "
                     "estimated durations and costs, walking/transfer burden, rental-car relevance, "
                     "budget notes, and unresolved transportation questions."
                 ),
