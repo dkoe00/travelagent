@@ -274,10 +274,10 @@ instead of two near-duplicate ones. Generated output is git-ignored.
 ## Other integration points
 
 - **Terminal CLI** ([`main.py`](../main.py)): runs a conversation loop with
-  `Runner.run_sync`, feeding `result.to_input_list()` back in each turn so constraint
-  extraction can stay conversational across multiple turns.
+  `Runner.run_sync`, feeding `result.to_input_list()` back in each turn and continuing
+  from `result.last_agent` so a handoff remains in charge on later user replies.
 - **Web frontend** ([`src/travelagent/api/`](../src/travelagent/api/) +
   [`frontend/`](../frontend/)): a FastAPI backend wraps the same Coordinator agent and
-  streams `Runner.run_streamed()` events over SSE to a React/Vite frontend. Vite's dev
-  server only serves the frontend — the FastAPI backend must be started separately (see
-  README).
+  streams `Runner.run_streamed()` events over SSE to a React/Vite frontend, preserving
+  both session history and the SDK's active agent. Vite's dev server only serves the
+  frontend — the FastAPI backend must be started separately (see README).

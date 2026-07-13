@@ -65,13 +65,15 @@ def main() -> None:
     validate_runtime_requirements(APP_CONFIG)
     configure_agents_sdk(APP_CONFIG)
     agent = build_coordinator_agent(APP_CONFIG)
+    current_agent = agent
     ui = _UI[APP_CONFIG.language]
     hooks = ProgressHooks(language=APP_CONFIG.language)
 
     brief = collect_brief(ui)
     print("\n" + "─" * 40 + "\n")
 
-    result = Runner.run_sync(agent, brief, hooks=hooks)
+    result = Runner.run_sync(current_agent, brief, hooks=hooks)
+    current_agent = result.last_agent
     print(f"\n{result.final_output}\n")
 
     while True:
@@ -86,10 +88,11 @@ def main() -> None:
             print(ui["bye"])
             break
         result = Runner.run_sync(
-            agent,
+            current_agent,
             result.to_input_list() + [{"role": "user", "content": user_input}],
             hooks=hooks,
         )
+        current_agent = result.last_agent
         print(f"\n{result.final_output}\n")
 
 
