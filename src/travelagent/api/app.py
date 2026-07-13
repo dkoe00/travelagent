@@ -55,6 +55,7 @@ async def post_message(session_id: str, message: MessageRequest) -> StreamingRes
             result = Runner.run_streamed(session.agent, run_input)
             async for chunk in translate_stream(result):
                 yield chunk
+            session.agent = result.last_agent
             try:
                 session.history = result.to_input_list()
             except Exception:
