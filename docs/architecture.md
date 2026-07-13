@@ -271,13 +271,23 @@ creating `output/<slug of destination>/` if needed. `kind` is a `Literal["itiner
 "packing_list"]` so both the Coordinator and the Packing List Agent share one tool
 instead of two near-duplicate ones. Generated output is git-ignored.
 
+## Session completion
+
+The Packing List Agent also has access to
+[`tools/session.py`](../src/travelagent/tools/session.py)'s `finish_planning()` tool.
+It only mutates the per-run [`PlanningSessionState`](../src/travelagent/session_state.py)
+after the packing list has been saved; the application layer then exits the CLI loop or
+marks the API session complete. This avoids inferring shutdown from agent text or from
+the mere fact that a handoff happened.
+
 ## Other integration points
 
 - **Terminal CLI** ([`main.py`](../main.py)): runs a conversation loop with
   `Runner.run_sync`, feeding `result.to_input_list()` back in each turn and continuing
-  from `result.last_agent` so a handoff remains in charge on later user replies.
+  from `result.last_agent` so a handoff remains in charge on later user replies. It
+  passes shared `PlanningSessionState` into every run and exits when `should_exit` is set.
 - **Web frontend** ([`src/travelagent/api/`](../src/travelagent/api/) +
   [`frontend/`](../frontend/)): a FastAPI backend wraps the same Coordinator agent and
   streams `Runner.run_streamed()` events over SSE to a React/Vite frontend, preserving
-  both session history and the SDK's active agent. Vite's dev server only serves the
-  frontend — the FastAPI backend must be started separately (see README).
+  session history, SDK active agent, and completion state. Vite's dev server only serves
+  the frontend — the FastAPI backend must be started separately (see README).
