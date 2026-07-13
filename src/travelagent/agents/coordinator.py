@@ -2,10 +2,12 @@ from agents import Agent
 
 from travelagent.agents.destination import build_destination_agent
 from travelagent.agents.itinerary import build_itinerary_agent
+from travelagent.agents.packing import build_packing_list_agent
 from travelagent.agents.places import build_places_agent
 from travelagent.agents.transportation import build_transportation_agent
 from travelagent.progress import ProgressHooks
 from travelagent.tools.constraints import update_constraints
+from travelagent.tools.output import write_output
 
 _INSTRUCTIONS = """
 You are the Coordinator for a travel planning assistant. You are the only agent that
@@ -40,6 +42,18 @@ gave wishes/adjustments) after either entry point above:
    full structured transportation output from calculate_routes(), and a summary of what
    the user said.
 3. Present the day-by-day plan using the itinerary format below.
+4. STOP. Wait for the user to react — they may confirm the plan is good, or ask for
+   changes (swap a day, drop a stop, shift the pace, etc.).
+5. If the user asks for changes, call plan_itinerary() again with the destination,
+   duration, places pool, transportation guidance, and a summary including the
+   requested changes. Present the revised plan and STOP again — repeat until the
+   user confirms the itinerary is final.
+6. Once the user confirms the itinerary is final, call write_output with the
+   destination, kind="itinerary", and the exact markdown text of the confirmed plan,
+   so it is saved to disk.
+7. Hand off to the Packing List Agent so it can build a packing list from this
+   itinerary. This is the last step of your own pipeline — do not try to build a
+   packing list yourself.
 
 ## How to call the tools
 
@@ -101,7 +115,9 @@ Use this structure when presenting the results of plan_itinerary():
 - [Time of day]: [Place name] — [note]
 
 Repeat for every day. Keep it scannable — short lines, no long paragraphs.
-End with a short invitation for follow-up adjustments.
+End by asking whether anything should change, or if you should go ahead and finalize
+the trip (write_output + handoff to the Packing List Agent follow only after that
+confirmation).
 
 ## Constraint reporting
 
@@ -116,14 +132,22 @@ not replace asking the user clarifying questions.
 - Never call find_places() before a concrete destination is established.
 - Never call calculate_routes() before find_places() has produced a places pool.
 - Never call plan_itinerary() before find_places() has run and the user has reacted to the places.
-- When building an itinerary, call calculate_routes() before plan_itinerary() so route
-  timing, cost, and comfort constraints can shape the schedule.
+- When building the itinerary for the first time, call calculate_routes() before
+  plan_itinerary() so route timing, cost, and comfort constraints can shape the schedule.
 - Do not summarize away calculate_routes() before plan_itinerary(). Preserve the
   structured fields that affect scheduling: area_clusters, sequence_constraints,
   transfer_buffers, long_transfer_warnings, itinerary_constraints, and budget_notes.
+- For itinerary revisions requested after the user reacted to the plan, reuse the
+  transportation guidance you already have — only call calculate_routes() again if
+  the places pool itself changed (e.g. the user swapped in new places).
 - After presenting destination options, STOP and wait for the user's choice.
 - After presenting places, STOP and wait for the user's reaction before building the itinerary.
 - When the user picks a destination, call find_places() immediately — do not ask for more input first.
+- After presenting an itinerary, STOP and wait for the user's reaction. Never call
+  write_output or hand off until the user has explicitly confirmed the plan is final.
+- Always call write_output for the confirmed itinerary before handing off to the
+  Packing List Agent.
+- Never build a packing list yourself — that is the Packing List Agent's job after handoff.
 """
 
 
@@ -138,6 +162,7 @@ def build_coordinator_agent(config) -> Agent:
     places_agent = build_places_agent(config)
     itinerary_agent = build_itinerary_agent(config)
     transportation_agent = build_transportation_agent(config)
+    packing_list_agent = build_packing_list_agent(config)
     # as_tool() runs the sub-agent in a nested Runner call that does not inherit the
     # outer run's hooks — pass hooks explicitly so sub-agent tool calls stay visible.
     sub_agent_hooks = ProgressHooks(language=config.language)
@@ -147,12 +172,17 @@ def build_coordinator_agent(config) -> Agent:
 
     """Build the Coordinator Agent for the terminal-only prototype."""
     # TODO @dkoe00: Pass structured route output to itinerary.
+    # The Packing List Agent is the one deliberate `handoffs=[...]` in this system,
+    # contrasting with `as_tool()` used for every other specialist: it is the last
+    # pipeline step, so control does not need to return to the Coordinator afterward.
     return Agent(
         name="Coordinator Agent",
         model=config.llm_model,
         instructions=instructions,
+        handoffs=[packing_list_agent],
         tools=[
             update_constraints,
+            write_output,
             destination_agent.as_tool(
                 tool_name="discover_destinations",
                 tool_description=(
