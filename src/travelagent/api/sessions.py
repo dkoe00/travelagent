@@ -10,13 +10,16 @@ from agents import Agent
 
 from travelagent.agents.coordinator import build_coordinator_agent
 from travelagent.config import APP_CONFIG
+from travelagent.session_state import PlanningSessionState
 
 
 @dataclass
 class ChatSession:
     session_id: str
     agent: Agent
+    state: PlanningSessionState = field(default_factory=PlanningSessionState)
     history: list[dict[str, Any]] = field(default_factory=list)
+    completed: bool = False
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
 
 

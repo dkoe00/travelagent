@@ -15,6 +15,9 @@ uv.lock
 # Secrets
 .env
 
+# Generated pipeline output (itinerary.md, packing-list.md)
+output/
+
 # Claude files
 CLAUDE.md
 .claude/

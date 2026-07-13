@@ -4,6 +4,7 @@ from travelagent.agents.coordinator import build_coordinator_agent
 from travelagent.config import APP_CONFIG, validate_runtime_requirements
 from travelagent.progress import ProgressHooks
 from travelagent.runtime import configure_agents_sdk
+from travelagent.session_state import PlanningSessionState
 
 _UI = {
     "de": {
@@ -65,14 +66,20 @@ def main() -> None:
     validate_runtime_requirements(APP_CONFIG)
     configure_agents_sdk(APP_CONFIG)
     agent = build_coordinator_agent(APP_CONFIG)
+    current_agent = agent
+    state = PlanningSessionState()
     ui = _UI[APP_CONFIG.language]
     hooks = ProgressHooks(language=APP_CONFIG.language)
 
     brief = collect_brief(ui)
     print("\n" + "─" * 40 + "\n")
 
-    result = Runner.run_sync(agent, brief, hooks=hooks)
+    result = Runner.run_sync(current_agent, brief, context=state, hooks=hooks)
+    current_agent = result.last_agent
     print(f"\n{result.final_output}\n")
+    if state.should_exit:
+        print(ui["bye"])
+        return
 
     while True:
         try:
@@ -86,11 +93,16 @@ def main() -> None:
             print(ui["bye"])
             break
         result = Runner.run_sync(
-            agent,
+            current_agent,
             result.to_input_list() + [{"role": "user", "content": user_input}],
+            context=state,
             hooks=hooks,
         )
+        current_agent = result.last_agent
         print(f"\n{result.final_output}\n")
+        if state.should_exit:
+            print(ui["bye"])
+            break
 
 
 if __name__ == "__main__":

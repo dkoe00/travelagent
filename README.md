@@ -19,6 +19,8 @@ The assistant is intended to create travel itineraries and packing lists while c
 
 ## Current Pipeline
 
+For the full agent architecture, interaction diagram, and the `as_tool()` vs. `handoffs` design rationale, see [docs/architecture.md](docs/architecture.md).
+
 The assistant handles both **concrete** requests ("I want to go to Albania — what can I do there?") and **vague** ones ("I want to hike along the coast somewhere in Europe"). Both feed the same pipeline; the Coordinator interactively extracts constraints and decides where to enter.
 
 The Coordinator stays the single conversational partner. It orchestrates specialists via the SDK's `agent.as_tool()` so specialist results return to the Coordinator.
@@ -40,6 +42,7 @@ Coordinator → Places Agent → pool of POIs / restaurants / stays
 - **Transportation Agent**: compares route options, estimates travel times and costs, returns clusters, sequencing constraints, transfer buffers, and long-transfer warnings for itinerary planning
 - **Budget Agent**: estimates transportation costs and explains cost assumptions; currently used by the Transportation Agent
 - **Itinerary Planner Agent**: schedules the selected places into feasible day-by-day time blocks using transportation guidance
+- **Packing List Agent**: once the itinerary is confirmed, receives control via a `handoffs=[...]` handoff (the one deliberate handoff in this system) and builds a packing list from it
 
 ## Tech Stack
 
