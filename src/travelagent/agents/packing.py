@@ -1,6 +1,7 @@
 from agents import Agent
 
 from travelagent.tools.output import write_output
+from travelagent.tools.session import finish_planning
 
 _INSTRUCTIONS = """
 You are the Packing List Agent for a travel planning assistant. You receive control
@@ -34,7 +35,8 @@ itinerary the Coordinator already presented. Use that to infer:
 
 4. Call write_output with the destination, kind="packing_list", and the exact
    markdown text from step 3, so it is saved to disk.
-5. Present the same markdown packing list as your final answer to the user,
+5. Call finish_planning to mark the workflow complete.
+6. Present the same markdown packing list as your final answer to the user,
    including a brief note that it has been saved.
 
 ## Rules
@@ -44,6 +46,9 @@ itinerary the Coordinator already presented. Use that to infer:
   briefly rather than guessing specifics.
 - Keep the list practical and scannable — no long explanations per item.
 - Always call write_output before giving your final answer.
+- Always call finish_planning after write_output succeeds and before giving
+  your final answer.
+- Never call finish_planning before the packing list has been saved.
 - Do not ask whether to show or save the packing list. The handoff means the
   user already confirmed the final itinerary and requested completion.
 - Do not claim the packing list will be created later. There is no background
@@ -65,5 +70,5 @@ def build_packing_list_agent(config) -> Agent:
         name="Packing List Agent",
         model=config.llm_model,
         instructions=instructions,
-        tools=[write_output],
+        tools=[write_output, finish_planning],
     )
